@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="gb2312">
+		<title></title>
+	</head>
+	<style>
+		body{
+			display: flex;
+			flex-direction: row;
+			/*align-items: center;*/
+        	justify-content: center;
+			position: relative;
+			width: 100%;
+			border:1px solid palegreen;
+			overflow: hidden;
+		}
+		#line1,#circle,#match,#border{
+			transition: all 10s;
+			float:left;
+			position: absolute;
+			
+		}
+		#line1{
+			margin: 50px;
+			margin-left: 33px;
+			transform:  ;
+		}
+		#key{
+			position: relative;
+			margin-left:50px;
+	
+		}
+		.circle{
+			position: absolute;
+			margin-top:60px;
+			width: 80px;
+			height:80px;
+			z-index: 10;
+			
+		}
+		#border{
+			width: 360px;
+			height:360px;
+		}
+		#match{
+			margin:50px 0 0 200px ;
+			width:100px;
+			height:100px;
+			z-index: 10;
+		}
+		#box{
+			position: relative;
+			width:400px;
+			height: 400px;
+			transform: scale(0.8,0.8);
+		}
+		/*#border:hover{
+			transform: rotate(140deg);
+			-webkit-transform: rotate(140deg);
+		}*/
+		#words{
+			border:1px solid  lightskyblue;
+			width: 300px;
+			height: 600px;
+			position: relative;
+		}
+		ul{
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+		}
+		ul li{
+			width:160px;
+			height:50px;
+			font-size:28px;
+			color:white;
+			line-height: 50px;
+			list-style-type: none;
+			background-color: #008B8B;
+			text-align: center;
+			border: 1px solid goldenrod;
+		}
+		#modes li{
+			display: none;
+		}
+		@keyframes myfirst
+		{
+		   0{
+		    	transform: rotate(0deg)  ;
+				-webkit-transform: rotate(0deg);
+			}
+			25%{
+		    	transform: rotate(-80deg)  ;
+				-webkit-transform: rotate(-80deg);
+		    }
+		    50%{
+		    	transform: rotate(0)  ;
+				-webkit-transform: rotate(0);
+		    }
+		    75%{
+		    	transform: rotate(80deg)  ;
+				-webkit-transform: rotate(80deg);
+		    }
+		    100%{
+		    	transform: rotate(0deg)  ;
+				-webkit-transform: rotate(0deg);
+			}
+		}
+		 
+		@-webkit-keyframes myfirst 
+		{
+		     0{
+		    	transform: rotate(0deg)  ;
+				-webkit-transform: rotate(0deg);
+			}
+			25%{
+		    	transform: rotate(-80deg)  ;
+				-webkit-transform: rotate(-80deg);
+		    }
+		    50%{
+		    	transform: rotate(0)  ;
+				-webkit-transform: rotate(0);
+		    }
+		    75%{
+		    	transform: rotate(80deg)  ;
+				-webkit-transform: rotate(80deg);
+		    }
+		    100%{
+		    	transform: rotate(0deg)  ;
+				-webkit-transform: rotate(0deg);
+			}
+	}
+		@keyframes mySecond
+		{
+		    from {
+		    	transform: scale(1,1) ;
+				-webkit-transform: scale(1,1);
+				}
+		    to {
+		    	transform:scale(0.5,0.5)  ;
+				-webkit-transform: scale(0.5,0.5) ;
+		    }
+		}
+		 
+		@-webkit-keyframes mySecond
+		{
+		    from {
+		    	transform: scale(1,1) ;
+				-webkit-transform:scale(1,1);
+		    }
+		    to {
+		    	transform: scale(0.5,0.5) ;
+				-webkit-transform: scale(0.5,0.5);
+		    }
+		}
+	.z{
+		margin-top: 140px;
+		margin-left:20px ;
+	}
+	#words{
+		border:1px solid palegreen;
+	}
+	#words p{
+		border:1px solid darkcyan;
+	}
+	</style>
+	<body>
+		<div id="box">
+			<div id="key">
+				<img src="img/circle.png" class="circle" style="display: none;">
+				<img src="img/stop.png" class="circle" />
+			</div>
+			
+			<img src="img/match.png" id="match">
+			<img src="img/circle-border.png" id="border">
+			<img src="img/circleLine.png" id="line1">
+			<img src="img/Z.png" class="z"/>
+		</div>
+		<audio controls="controls">
+			<source src="vedio/冯绍峰 - 百年轮回.mp3">
+		</audio>
+		<div id="words">
+		</div>
+		<button id="play">play</button>
+		<button id="pre">previse</button>
+		<button id="next">next</button>
+		<ul id="chooseMode">
+			<li>
+				模式
+				<ul id="modes">
+					<li>loop</li>
+					<li id="try">auto</li>
+					<li>accident</li>
+				</ul>
+			</li>
+		</ul>
+		<script type="text/javascript" src="js/jquery-3.1.1.min.js" charset="gb2312"></script>
+		<script>	
+			var musiclist=[
+			"vedio/冯绍峰 - 百年轮回.mp3",
+			"vedio/王珞丹,朴树 - 清白之年.mp3",
+			"vedio/老狼,王婧 - 想把我唱给你听.mp3"];
+			//获取界面元素
+			$music=$('audio');
+			$btnPlay=$('#play');
+			$btnPre=$('#pre');
+			$btnNext=$('#next');
+			$chosMode=$('#chooseMode');	
+			$modes=$("#modes li");
+			$rotate=$("#line1");
+			$z=$('.z');
+			$eye=$('.circle');
+			$words=$('#words');
+			
+			//定义变量
+			var pos=0;
+			var onlyOne=true;
+			var	time1=null;
+			
+			//歌曲播放模式
+			$($modes[0]).click(function(){
+				var stop1=clearInterval(time1);
+					onlyOne=true;
+				$music[pos].loop=true;
+			});
+			$($modes[1]).click(function(){
+				if(onlyOne){
+					onlyOne=false;
+					time1=setInterval(function(){
+						if($music[pos].ended){
+							pos++;
+							if(pos==$music.length-1)
+							pos=0;
+							$music[pos].play();
+						}
+					
+					},1000);
+				}	
+			});
+			$chosMode.on('mouseover',function(){
+				$("#modes li").css('display','block');
+			});
+			$chosMode.on('mouseleave',function(){
+				$("#modes").css('display','none');
+			});
+			
+			
+			//暂停，播放
+			var launch=true;
+			$btnPlay.click(function(){
+				if(launch){
+					rotatePlay();
+					launch=false;
+				}
+				var state=($btnPlay.text()=="play")?$($eye[1]).click():$($eye[0]).click();
+				
+			});
+			//eye 点击事件
+			$($eye[0]).click(function(){
+			   eyeKey($eye[1],$eye[0],'paused');	
+			});
+			
+			$($eye[1]).click(function(){
+				if(launch){
+					rotatePlay();
+					launch=false;
+				}
+				eyeKey($eye[0],$eye[1],'running');	
+			});
+			//eye 点击事件实现方法
+			function eyeKey(obj1,obj2,state){
+				$(obj1).css('display','block');
+				$(obj2).css('display','none');
+				playOrpause();
+				rotateState(state);
+			}
+			
+			//实现音乐暂停或播放
+			function playOrpause(){
+				if($btnPlay.text()=="play"){
+					$music[pos].play();
+					$btnPlay.text("pause");
+				}
+				else{
+					$music[pos].pause();
+					$btnPlay.text("play");
+				}
+			}
+			//上一曲，下一曲
+			$btnPre.on('click',function(){
+				musicPlay(pos,--pos);
+			});
+			$btnNext.on('click',function(){
+				musicPlay(pos,++pos)
+			});
+			
+			//上一曲或下一曲实现方法
+			function musicPlay(pos1,pos2){
+				
+				$music[pos1].pause();
+				if(pos2<0){
+					pos=$music.length-1;
+				}
+				else if(pos2==$music.length){
+					pos=0;
+				}
+				pos2=pos;
+				$music[pos1].currentTime=0;
+				$music[pos2].play();
+			}
+			
+			//呼噜点击事件
+			$($z[0]).click(function(){
+				$($eye[1]).click();
+			});
+			
+
+			
+			//呼噜
+			sleep();
+			function sleep(){
+				$($z[0]).css({
+					
+					'animation-name':'mySecond ',
+					'animation-duration': '4s',
+					'animation-iteration-count':'infinite',
+					'animation-timing-function':'cubic-bezier(.46,.1,.97,.99)',
+					'animation-direction':'alternate',
+					'-webkit-animation-direction':'alternate',
+	
+					'-webkit-animation-name':'mySecond ',
+					'-webkit-animation-duration': '4s',
+					'-webkit-animation-iteration-count':'infinite',
+					'-webkit-animation-timing-function':'cubic-bezier(.46,.1,.97,.99)'
+				});
+			}
+			//呼噜状态
+			function sleepState(state,state2){
+					$($z[0]).css({		
+						'display':state2,
+						'animation-play-state':state,
+						'-webkit-animation-play-state':state
+					})
+			}
+			
+			//rotatePlay();
+			//鼻子旋转
+			function rotatePlay(){
+				sleepState('paused','none');
+				$($rotate).css({
+					'animation-name':'myfirst ',
+					'animation-duration': '4s',
+					'animation-iteration-count':'infinite',
+					'animation-timing-function':'linear',
+					'-webkit-animation-name':'myfirst ',
+					'-webkit-animation-duration': '4s',
+					'-webkit-animation-iteration-count':'infinite',
+					'-webkit-animation-timing-function':'linear'
+				});
+			}
+			//鼻子旋转状态
+			function rotateState(state){
+				$($rotate).css({
+					'animation-play-state':state,
+					'-webkit-animation-play-state':state
+				})
+			}
+			
+			//歌词
+			var times=new Array();
+			var rows=new Array();
+			var words=new Array();
+		    $.get("words/do we really care.txt",function(data){
+		    	
+		    	rows=data.split('\r');
+		        var pattern = /\[*:*.*]/g;
+		        times=data.match(pattern);
+		        for(var i=0;i<rows.length;i++){ 
+		        	words[i]=rows[i].replace(times[i],'');	
+		        	$newP=$('<p></p>').text(words[i]);
+		        	$words.append($newP);
+		        }
+				
+		    });
+		    
+		</script>		
+
+</body>
+</html>
